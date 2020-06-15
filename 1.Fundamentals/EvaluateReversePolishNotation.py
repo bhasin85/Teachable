@@ -1,29 +1,25 @@
+import math
+
 class Solution:
     def evalRPN(self, tokens: List[str]) -> int:
-        i = 0
+        # iterate through input and add it to stack
         
-        while i < len(tokens):
-            print("i:"+str(i)+ " tokens:"+str(tokens))
-            if not tokens[i].isnumeric() and tokens[i] != "(" and tokens[i] != ")":
-                # Swap digit with operator
-                temp = tokens[i-1]
-                tokens[i-1] = tokens[i]
-                tokens[i] = temp
-                print(str(tokens))
-                    
-                # Inserting closing bracket
-                tokens.insert(i+1, ")")
-                print(str(tokens))
-                    
-                # Inserting opening bracket
-                j = i-1
-                while tokens[j].isnumeric() or tokens[j] == "(":
-                    j -= 1
-                tokens.insert(j-1, "(")
-                print(str(tokens))
-                
-                # Incrementing because of extra brackets
-                i += 2
-            i += 1
-        print(str(tokens))
-        return i
+        # case 1: operator
+            # start poping last two element
+            # perform the operation
+            # add the result to stack
+        # case 2: number
+            # add to stack
+            
+        stack = []
+        for token in tokens:
+            if token in ["+", "-", "*", "/"]:
+                num2, num1 = stack.pop(), stack.pop()
+                result = eval("{}{}{}".format(num1, token, num2))
+                stack.append(math.trunc(result))
+            else:
+                stack.append(token)
+            #print("Token:{} Stack: {}".format(token, stack))
+            
+        # pop from stack
+        return stack.pop()
