@@ -1,112 +1,105 @@
-# flow check
-    # check for pacific
+# maintain visited nodes state in pacificGrid and atlanticGrid
+    # -1 -> Not calculated
+    #  0 -> flow not possible
+    #  1 -> flow possible
+# flow check - for pacific and atlantic
         # if x or y is 0 -> can reach pacific
-        # check pacific for l,r,u,d if current value is > l,r,u,d value
-    # check for atlantic
         # if x or y is equal to max x or max y -> can reach atlantic
-        # check atlantic for l,r,u,d if current value is > l,r,u,d value    
+        # check pacific and atlantic for l,r,u,d if current value is > l,r,u,d value    
+        # return pacific and atlantic values
         
 class Solution:
     def pacificAtlantic(self, matrix: List[List[int]]) -> List[List[int]]:
+        pacificGrid = [[-1 for y in range(len(matrix))] for x in range(len(matrix[0]))]
+        atlanticGrid= [[-1 for y in range(len(matrix))] for x in range(len(matrix[0]))]
+        flow_points = []
         
-        if len(matrix) == 0:
-            return matrix
-        pacific_memo, atlantic_memo = {}, {}
-        pacific_atlantic = []
-        
+        #print("pacificGrid :{}".format(pacificGrid))
+        #print("atlanticGrid:{}".format(atlanticGrid))
+                
         for y in range(len(matrix)):
             for x in range(len(matrix[0])):
-                max_value = matrix[y][x]
-                prin = True if y == 2 and x == 1 else False
-                print("x:{} y:{}".format(x, y))
-                pacific = self._DFS_pacific(y, x, matrix, pacific_memo, max_value, prefix)
-                atlantic = self._DFS_atlantic(y, x, matrix, atlantic_memo, max_value, prefix)
-                flow = pacific and atlantic
-                print("y:{} x:{} flow:{}".format(y, x, flow))
-                print("pacific_memo:  {}".format(pacific_memo))
-                print("atlantic_memo: {}".format(atlantic_memo))
-                if flow:
-                    pacific_atlantic.append([y, x])
+                _print = True #if y == 1 and x == 3 else False
+                is_pacific, is_atlantic = self._calc(y, x, pacificGrid, atlanticGrid, matrix, "--", _print)
+                print("y:{}, x:{} --> is_pacific:{} is_atlantic:{}".format(y, x, is_pacific, is_atlantic))
+                if is_pacific and is_atlantic:
+                    flow_points.append([y, x])
                     
-        return pacific_atlantic
-    
-    def _DFS_pacific(self, y, x, matrix, pacific_memo, max_value, prefix):
-        key = "{}:{}".format(y, x)
+                
+        return flow_points
         
-        if key in pacific_memo and max_value >= matrix[y][x]:
-            return pacific_memo[key]
+    def _calc(self, y, x, pacificGrid, atlanticGrid, matrix, prefix, _print):        
+        if _print:
+            print("{}> y:{}, x:{}".format(prefix, y, x))
             
-        if x == 0 or y == 0:
-            pacific_memo[key] = True
-            return True
-
-        if y == len(matrix)-1 or x == len(matrix[0])-1:
-            pacific_memo[key] = False
-            return False
+        # if y < 0 or x < 0 or y > len(matrix)-1 or x > len(matrix[0])-1:
+        #     return False, False
         
-        if matrix[y][x] > max_value: 
-            pacific_memo[key] = False
-            return False
+        # Already calculated
+        if pacificGrid[y][x] != -1 and atlanticGrid[y][x] != -1:  
+            if _print:
+                print("pacificGrid :{}".format(pacificGrid))
+                print("atlanticGrid:{}".format(atlanticGrid))                
+                print("{}> y:{}, x:{} already calculated".format(prefix, y, x))            
+            return True if pacificGrid[y][x] == 1 else False, True if atlanticGrid[y][x] == 1 else False
         
-        up = self._DFS_pacific(y-1, x, matrix, pacific_memo, max_value, prefix)
-        left = self._DFS_pacific(y, x-1, matrix, pacific_memo, max_value, prefix)
-        bottom = self._DFS_pacific(y+1, x, matrix, pacific_memo, max_value, prefix)
-        right = self._DFS_pacific(y, x+1, matrix, pacific_memo, max_value, prefix)  
-        pacific = True if up or left or bottom or right else False
+        is_pacific, is_atlantic = False, False
+        atlanticGrid[y][x], pacificGrid[y][x] = 0, 0
         
-        pacific_memo[key] = pacific
-        return pacific
-    
-    def _DFS_atlantic(self, y, x, matrix, atlantic_memo, max_value, prefix):
-        key = "{}:{}".format(y, x)
-        
-        if key in atlantic_memo and max_value >= matrix[y][x]:
-            return atlantic_memo[key]
-        
-        if x == 0 or y == 0:
-            atlantic_memo[key] = False
-            return False
-        
-        if y == len(matrix)-1 or x == len(matrix[0])-1:
-            atlantic_memo[key] = True
-            return True
-        
-        if matrix[y][x] > max_value: 
-            atlantic_memo[key] = False
-            return False
-        
-        up = self._DFS_atlantic(y-1, x, matrix, atlantic_memo, max_value, prefix)
-        left = self._DFS_atlantic(y, x-1, matrix, atlantic_memo, max_value, prefix)
-        bottom = self._DFS_atlantic(y+1, x, matrix, atlantic_memo, max_value, prefix)
-        right = self._DFS_atlantic(y, x+1, matrix, atlantic_memo, max_value, prefix)  
-        atlantic = True if up or left or bottom or right else False
-        
-        atlantic_memo[key] = atlantic
-        return atlantic
-        
-    def _DFS(self, y, x, matrix, memo, max_value, prefix):
-        key = "{}:{}".format(y, x)
-        
-        if key in memo and max_value >= matrix[y][x]:
-            return memo[key]
+        if y == 0 or x == 0:
+            pacificGrid[y][x] = 1
+            is_pacific = True
             
-        if x == 0 or y == 0:
-            pacific_memo[key] = True
-            return True
-
         if y == len(matrix)-1 or x == len(matrix[0])-1:
-            pacific_memo[key] = False
-            return False
+            atlanticGrid[y][x] = 1
+            is_atlantic = True
+            
+        # corner points - no need to calculate further
+        if is_pacific and is_atlantic:
+            return is_pacific, is_atlantic
         
-        if matrix[y][x] > max_value: 
-            pacific_memo[key] = False
-            return False
+        # up
+        if y-1 >= 0 and pacificGrid[y][x] > pacificGrid[y-1][x]:
+            if _print:
+                print("{}> y:{}, x:{} Going up".format(prefix, y, x))            
+            up_is_pacific, up_is_atlantic = self._calc(y-1, x, pacificGrid, atlanticGrid, matrix, prefix + "--", _print)  
+        else: 
+            up_is_pacific, up_is_atlantic = False, False
         
-        up = self._DFS_pacific(y-1, x, matrix, pacific_memo, max_value, prefix)
-        left = self._DFS_pacific(y, x-1, matrix, pacific_memo, max_value, prefix)
-        bottom = self._DFS_pacific(y+1, x, matrix, pacific_memo, max_value, prefix)
-        right = self._DFS_pacific(y, x+1, matrix, pacific_memo, max_value, prefix)  
-        pacific = True if up or left or bottom or right else False
+        # left
+        if y-1 >= 0 and pacificGrid[y][x] > pacificGrid[y-1][x]:
+            if _print:
+                print("{}> y:{}, x:{} Going left".format(prefix, y, x))              
+            left_is_pacific, left_is_atlantic = self._calc(y, x-1, pacificGrid, atlanticGrid, matrix, prefix + "--", _print)  
+        else: 
+            left_is_pacific, left_is_atlantic = False, False
         
-        pacific_memo[key] = pacific
-        return pacific
+        # down
+        if y+1 <= len(matrix)-1 and pacificGrid[y][x] > pacificGrid[y+1][x]:
+            if _print:
+                print("{}> y:{}, x:{} Going down".format(prefix, y, x))              
+            down_is_pacific, down_is_atlantic = self._calc(y+1, x, pacificGrid, atlanticGrid, matrix, prefix + "--", _print)  
+        else: 
+            down_is_pacific, down_is_atlantic = False, False
+        
+        # right
+        if x+1 <= len(matrix[0])-1 and pacificGrid[y][x] > pacificGrid[y][x+1]:
+            if _print:
+                print("{}> y:{}, x:{} Going right".format(prefix, y, x))              
+            right_is_pacific, right_is_atlantic = self._calc(y, x+1, pacificGrid, atlanticGrid, matrix, prefix + "--", _print)  
+        else: 
+            right_is_pacific, right_is_atlantic = False, False
+
+        if up_is_pacific or left_is_pacific or down_is_pacific or right_is_pacific:
+            if _print:
+                print("{}> y:{}, x:{} is pacific".format(prefix, y, x))              
+            pacificGrid[y][x] = 1
+            is_pacific = True 
+
+        if up_is_atlantic or left_is_atlantic or down_is_atlantic or right_is_atlantic:
+            if _print:
+                print("{}> y:{}, x:{} is atlantic".format(prefix, y, x))               
+            atlanticGrid[y][x] = 1
+            is_atlantic = True  
+
+        return is_pacific, is_atlantic
