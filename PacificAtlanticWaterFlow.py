@@ -1,105 +1,108 @@
-# maintain visited nodes state in pacificGrid and atlanticGrid
-    # -1 -> Not calculated
-    #  0 -> flow not possible
-    #  1 -> flow possible
-# flow check - for pacific and atlantic
-        # if x or y is 0 -> can reach pacific
-        # if x or y is equal to max x or max y -> can reach atlantic
-        # check pacific and atlantic for l,r,u,d if current value is > l,r,u,d value    
-        # return pacific and atlantic values
+
         
 class Solution:
     def pacificAtlantic(self, matrix: List[List[int]]) -> List[List[int]]:
-        pacificGrid = [[-1 for y in range(len(matrix))] for x in range(len(matrix[0]))]
-        atlanticGrid= [[-1 for y in range(len(matrix))] for x in range(len(matrix[0]))]
-        flow_points = []
+        pacific = [[False for column in range(len(matrix[0]))] for row in range(len(matrix))]
+        atlantic = [[False for column in range(len(matrix[0]))] for row in range(len(matrix))]
+        visited = [[False for column in range(len(matrix[0]))] for row in range(len(matrix))]
         
-        #print("pacificGrid :{}".format(pacificGrid))
-        #print("atlanticGrid:{}".format(atlanticGrid))
-                
-        for y in range(len(matrix)):
-            for x in range(len(matrix[0])):
-                _print = True #if y == 1 and x == 3 else False
-                is_pacific, is_atlantic = self._calc(y, x, pacificGrid, atlanticGrid, matrix, "--", _print)
-                print("y:{}, x:{} --> is_pacific:{} is_atlantic:{}".format(y, x, is_pacific, is_atlantic))
-                if is_pacific and is_atlantic:
-                    flow_points.append([y, x])
-                    
-                
-        return flow_points
+        result = []
+        for row in range(len(matrix)):
+            for column in range(len(matrix[0])):
+                _print = True if row == 3 and column ==27 else False
+                self._pacificAtlantic(matrix, row, column, result, visited, pacific, atlantic, _print)
+                if _print:
+                    print("-------->row:{} column:{}".format(row, column))
+        return result
         
-    def _calc(self, y, x, pacificGrid, atlanticGrid, matrix, prefix, _print):        
+    def _pacificAtlantic(self, matrix, row, column, result, visited, pacific, atlantic, _print):
+        _print = True if row == 3 and column ==27 else False
         if _print:
-            print("{}> y:{}, x:{}".format(prefix, y, x))
+            print("row:{} column:{}".format(row, column))
+        
+        if [row, column] in result:
+            if _print:
+                print("row:{} column:{} already found {}:{}".format(row, column, pacific[row][column], atlantic[row][column]))
+            return True, True 
+        
+        if not visited[row][column]:
+            visited[row][column] = True
+        else:
+            if _print:
+                print("row:{} column:{} already visited {}:{}".format(row, column, pacific[row][column], atlantic[row][column]))
+            return pacific[row][column], atlantic[row][column]
+        
+        # Pacific shore points
+        if row == 0 or column == 0:
+            pacific[row][column] = True
             
-        # if y < 0 or x < 0 or y > len(matrix)-1 or x > len(matrix[0])-1:
-        #     return False, False
-        
-        # Already calculated
-        if pacificGrid[y][x] != -1 and atlanticGrid[y][x] != -1:  
-            if _print:
-                print("pacificGrid :{}".format(pacificGrid))
-                print("atlanticGrid:{}".format(atlanticGrid))                
-                print("{}> y:{}, x:{} already calculated".format(prefix, y, x))            
-            return True if pacificGrid[y][x] == 1 else False, True if atlanticGrid[y][x] == 1 else False
-        
-        is_pacific, is_atlantic = False, False
-        atlanticGrid[y][x], pacificGrid[y][x] = 0, 0
-        
-        if y == 0 or x == 0:
-            pacificGrid[y][x] = 1
-            is_pacific = True
+        # Atlantic shore points
+        if row == len(matrix)-1 or column == len(matrix[0])-1:
+            atlantic[row][column] = True
             
-        if y == len(matrix)-1 or x == len(matrix[0])-1:
-            atlanticGrid[y][x] = 1
-            is_atlantic = True
+        # Check is shore point
+        if pacific[row][column] and atlantic[row][column]:
+            result.append([row, column])
+            if _print:
+                print("row:{} column:{} shore {}:{}".format(row, column, pacific[row][column], atlantic[row][column]))            
+            return pacific[row][column], atlantic[row][column]
             
-        # corner points - no need to calculate further
-        if is_pacific and is_atlantic:
-            return is_pacific, is_atlantic
-        
-        # up
-        if y-1 >= 0 and pacificGrid[y][x] > pacificGrid[y-1][x]:
+        # find neighbours
+        up    = [row-1, column] if row-1>=0 else [-1, -1]
+        down  = [row+1, column] if row+1<=len(matrix)-1 else [-1, -1]
+        left  = [row, column-1] if column-1>=0 else [-1, -1]
+        right = [row, column+1] if column+1<=len(matrix[0])-1 else [-1, -1]
+        if _print:
+            print("row:{} column:{} up:{} down:{} left:{} right:{}".format(row, column, up, down, left, right))
+            
+        if up != [-1, -1] and matrix[row][column] >= matrix[up[0]][up[1]]:
+            self._pacificAtlantic(matrix, up[0], up[1], result, visited, pacific, atlantic, _print)
+            pacific[row][column] =  pacific[row][column] or pacific[up[0]][up[1]]
+            atlantic[row][column] =  atlantic[row][column] or atlantic[up[0]][up[1]]  
             if _print:
-                print("{}> y:{}, x:{} Going up".format(prefix, y, x))            
-            up_is_pacific, up_is_atlantic = self._calc(y-1, x, pacificGrid, atlanticGrid, matrix, prefix + "--", _print)  
-        else: 
-            up_is_pacific, up_is_atlantic = False, False
-        
-        # left
-        if y-1 >= 0 and pacificGrid[y][x] > pacificGrid[y-1][x]:
+                print("row:{} column:{} up {}:{}".format(row, column, pacific[up[0]][up[1]], atlantic[up[0]][up[1]]))
+                
+        if down != [-1, -1] and matrix[row][column] >= matrix[down[0]][down[1]]:
+            self._pacificAtlantic(matrix, down[0], down[1], result, visited, pacific, atlantic, _print)
+            pacific[row][column] =  pacific[row][column] or pacific[down[0]][down[1]]
+            atlantic[row][column] =  atlantic[row][column] or atlantic[down[0]][down[1]]
             if _print:
-                print("{}> y:{}, x:{} Going left".format(prefix, y, x))              
-            left_is_pacific, left_is_atlantic = self._calc(y, x-1, pacificGrid, atlanticGrid, matrix, prefix + "--", _print)  
-        else: 
-            left_is_pacific, left_is_atlantic = False, False
-        
-        # down
-        if y+1 <= len(matrix)-1 and pacificGrid[y][x] > pacificGrid[y+1][x]:
+                print("row:{} column:{} down {}:{}".format(row, column, pacific[down[0]][down[1]], atlantic[down[0]][down[1]]))
+            
+        if left != [-1, -1] and matrix[row][column] >= matrix[left[0]][left[1]]:
+            self._pacificAtlantic(matrix, left[0], left[1], result, visited, pacific, atlantic, _print)
+            pacific[row][column] =  pacific[row][column] or pacific[left[0]][left[1]]
+            atlantic[row][column] =  atlantic[row][column] or atlantic[left[0]][left[1]]
+            if _print:    
+                print("row:{} column:{} left {}:{}".format(row, column, pacific[left[0]][left[1]], atlantic[left[0]][left[1]]))
+            
+        if right != [-1, -1] and matrix[row][column] >= matrix[right[0]][right[1]]:
+            self._pacificAtlantic(matrix, right[0], right[1], result, visited, pacific, atlantic, _print) 
+            pacific[row][column] =  pacific[row][column] or pacific[right[0]][right[1]]
+            atlantic[row][column] =  atlantic[row][column] or atlantic[right[0]][right[1]]
             if _print:
-                print("{}> y:{}, x:{} Going down".format(prefix, y, x))              
-            down_is_pacific, down_is_atlantic = self._calc(y+1, x, pacificGrid, atlanticGrid, matrix, prefix + "--", _print)  
-        else: 
-            down_is_pacific, down_is_atlantic = False, False
-        
-        # right
-        if x+1 <= len(matrix[0])-1 and pacificGrid[y][x] > pacificGrid[y][x+1]:
-            if _print:
-                print("{}> y:{}, x:{} Going right".format(prefix, y, x))              
-            right_is_pacific, right_is_atlantic = self._calc(y, x+1, pacificGrid, atlanticGrid, matrix, prefix + "--", _print)  
-        else: 
-            right_is_pacific, right_is_atlantic = False, False
-
-        if up_is_pacific or left_is_pacific or down_is_pacific or right_is_pacific:
-            if _print:
-                print("{}> y:{}, x:{} is pacific".format(prefix, y, x))              
-            pacificGrid[y][x] = 1
-            is_pacific = True 
-
-        if up_is_atlantic or left_is_atlantic or down_is_atlantic or right_is_atlantic:
-            if _print:
-                print("{}> y:{}, x:{} is atlantic".format(prefix, y, x))               
-            atlanticGrid[y][x] = 1
-            is_atlantic = True  
-
-        return is_pacific, is_atlantic
+                print("row:{} column:{} right {}:{}".format(row, column, pacific[right[0]][right[1]], atlantic[right[0]][right[1]]))
+            
+        if pacific[row][column] and atlantic[row][column]:
+            result.append([row, column])
+            
+        if _print:    
+            print("row:{} column:{} return {}:{}".format(row, column, pacific[row][column], atlantic[row][column])) 
+        return pacific[row][column], atlantic[row][column]
+    
+    # result +ve
+    # failed -ve
+    
+    # iterate every point
+        # given point
+            # Pacific
+                # first row, first column or neighbour is touching pacific <= current
+                # if the neighbour is in result and current >= neighboure return true
+                # if the neighbour is in failed and current <= neighboure return false
+                # if neighbour true return else continue exploring other neighbours
+            # Atlantic
+                # last row, last column or neighbour is touching atlantic <= current  
+                # if the neighbour is in result and current >= neighboure return true
+                # if the neighbour is in failed and current <= neighboure return false                
+                # if neighbour true return else continue exploring other neighbours
+            # both condition met add it to result
