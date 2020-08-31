@@ -1,0 +1,97 @@
+763. Partition Labels
+https://leetcode.com/problems/partition-labels/
+
+A string S of lowercase English letters is given. We want to partition this string into as many parts as possible so that each letter appears in at most one part, and return a list of integers representing the size of these parts.
+
+ 
+
+Example 1:
+
+Input: S = "ababcbacadefegdehijhklij"
+Output: [9,7,8]
+Explanation:
+The partition is "ababcbaca", "defegde", "hijhklij".
+This is a partition so that each letter appears in at most one part.
+A partition like "ababcbacadefegde", "hijhklij" is incorrect, because it splits S into less parts.
+ 
+
+Note:
+
+S will have length in range [1, 500].
+S will consist of lowercase English letters ('a' to 'z') only.
+
+
+'''
+1. Observations/constraints
+
+Max 26 partitions for input [a-z]
+Min 1 partition
+Only input a - z i.e. small letters
+Letter will only be present in one partition
+
+2. List one problem you've done before that is similar to this problem
+
+Find number of pallindromes in a string
+
+3. What are 2 approaches that you think might work? Why did you pick these 2?
+
+Fixed Window Approach - hashmap with occurance count
+Fixed Window with last index
+
+
+4. Of the 2 approaches before, which one seems most promising? And why? Trade-offs Analysis
+
+Fixed Window with last index
+Less space
+Faster as less operations per iteration
+
+5. What are 5 tests cases you would use to verify your solution? Why did you pick these ones?
+
+"" - corner case
+"a-z" - max partitions
+"aaaaaaa" - one partition
+"abababcdcdcdeeeeee" - multiple partition/common case
+"zabcz" - one partition
+
+
+6. After considering the 2 candidate approaches, describe your proposed solution in 3 sentences or less. Please make sure your proposed solution passes the 5 tests cases you listed.
+
+prepare hashmap {letter: last_index}
+max_last_index = first letter last index
+Traverse till max_last_index
+Keep updating max_last_index with all the elements you find while getting to max_last_index
+by the time you reach max_last_index you will have a window where all the elements appears only in that window
+start again by initializing max_last_index with the next element till you reach end
+
+7. What is the run time of your proposed solution?
+
+O(n) - Find the last index of all elements and traverse the input
+
+8. How much space does your solution use?
+
+O(n) - to keep track of last indexes
+
+9. Please write pseudocode for this solution. Something that you might share with an interviewer before coding.
+
+"abababcdcdcdeeeeee"
+hashmap = {'a': 4, 'b': 5, 'c': 10: 'd': 11, 'e':17}
+
+window = 1
+answer = []
+
+traverse i = 0 to 17:
+    window + 1
+    i = 0 -> initialize max_last_index = 4
+    i = 1 -> update max_last_index = 5
+    i = 5 -> max_last_index reached, answer = [6], set window = 0
+    
+    i = 6 -> initialize max_last_index = 10
+    i = 7 -> update max_last_index = 11
+    i = 11 -> max_last_index reached, answer = [6, 5], set window = 0
+    
+    i = 12 -> initialize max_last_index = 17
+    i = 17 -> max_last_index reached, answer = [6, 5, 5], set window = 0    
+    
+return answer
+
+'''
