@@ -1,0 +1,100 @@
+1282. Group the People Given the Group Size They Belong To
+https://leetcode.com/problems/group-the-people-given-the-group-size-they-belong-to/
+
+There are n people, each of them has a unique ID from 0 to n - 1 and each person of them belongs to exactly one group.
+
+Given an integer array groupSizes which indicated that the person with ID = i belongs to a group of groupSize[i] persons.
+
+Return an array of the groups where ans[j] contains the IDs of the jth group. Each ID should belong to exactly one group and each ID should be present in your answer. Also if a person with ID = i belongs to group j in your answer, then ans[j].length == groupSize[i] should be true.
+
+If there is multiple answers, return any of them. It is guaranteed that there will be at least one valid solution for the given input.
+
+ 
+
+Example 1:
+
+Input: groupSizes = [3,3,3,3,3,1,3]
+Output: [[5],[0,1,2],[3,4,6]]
+Explanation: 
+Other possible solutions are [[2,1,6],[5],[0,4,3]] and [[5],[0,6,2],[4,3,1]].
+Example 2:
+
+Input: groupSizes = [2,1,3,3,3,2]
+Output: [[1],[0,5],[2,3,4]]
+ 
+
+Constraints:
+
+groupSizes.length == n
+1 <= n <= 500
+1 <= groupSizes[i] <= n
+
+
+
+'''
+
+1. List one problem you've done before that is similar to this problem
+
+Suduko problem
+
+
+2. What are 2 approaches that you think might work? Why did you pick these 2?
+
+Greedy Approach
+Find the number of buckets/groups
+Start filling element to the group satisfying the given condition i.e. i belong to the group of size groupSizes[i]
+
+Brute Force 
+For example [3,3,3,3,3,1,3] - 7 elements to be placed in 3 groups of 1, 3 and 3 elements. Find all combinations how 7 elements can be arrange and check for the condition i.e. i belong to the group of size groupSizes[i]
+
+3. Of the 2 approaches before, which one seems most promising? And why?
+
+Greedy Approach looks promising as we can get the possible ans by carefully selecting the right elements, instead of finding all the possible combinations/answers and returning one of them. Greedy approach will be faster.
+
+
+4. What are 5 tests cases you would use to verify your solution? Why did you pick these ones?
+
+[] - corner case
+[3, 1, 2, 3, 2, 3] - simple case
+[1, 1, 1, 1, 1] - individual groups
+[2, 2, 2, 2, 2, 2] - all same numbers
+[5, 5, 5, 5, 5] - one group
+
+5. After considering the 2 candidate approaches, describe your proposed solution in 3 sentences or less. Please make sure your proposed solution passes the 5 tests cases you listed.
+
+hashmap = {1: [], 2:[], 3:[]}
+{1: [], 2:[] []}
+{1: [], 2:[], 3:[0]}
+{1: [1], 2:[], 3:[0]}
+{1: [1], 2:[2], 3:[0]}
+{1: [1], 2:[2], 3:[0, 3]}
+{1: [1], 2:[2, 4], 3:[0, 3]}
+{1: [1], 2:[2, 4], 3:[0, 3, 5]}
+
+
+6. What is the run time of your proposed solution?
+
+O(n) - Preparing a dictionary and answer
+
+7. How much space does your solution use?
+
+O(n)
+
+8. Please write pseudocode for this solution. Something that you might share with an interviewer before coding.
+
+traverse groupSizes with i index:
+    hashmap[groupSize] add i 
+    
+hashmap is ready
+answer = []
+
+traverse hashmap:
+    for a given key
+        while have elements
+            retrieve key elements from value -> value[:key]
+            make a list (value[:key]) and add it to the answer
+            
+return answer
+
+
+'''
