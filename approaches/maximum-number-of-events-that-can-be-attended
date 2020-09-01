@@ -1,0 +1,107 @@
+1353. Maximum Number of Events That Can Be Attended
+https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended/
+
+Given an array of events where events[i] = [startDayi, endDayi]. Every event i starts at startDayi and ends at endDayi.
+
+You can attend an event i at any day d where startTimei <= d <= endTimei. Notice that you can only attend one event at any time d.
+
+Return the maximum number of events you can attend.
+
+
+'''
+1. Observations/constraints
+
+start will be start of earliest event
+end will be end of latest event
+attend only one day of the event
+
+2. List one problem you've done before that is similar to this problem
+
+suduko
+
+
+3. What are 2 approaches that you think might work? Why did you pick these 2?
+
+Backtracking - Same as BFS O(On^2)
+BFS - For a given day you can have more than 1 event. You would wan't to select every event and see if it give you max attended event value. O (n^2)
+Recursion with optimization O(n)
+
+4. Of the 2 approaches before, which one seems most promising? And why? Trade-offs Analysis
+
+Backtracking will be space efficient. But will have to explore all the paths.
+BFS will take more space but will be faster, as we will get to all events attended path early.
+
+5. What are 5 tests cases you would use to verify your solution? Why did you pick these ones?
+
+[[1,2],[2,3],[3,4]] - common case
+[[1,1],[5,5]] - far stretched events
+[[1,2],[1,3],[2,3],[2,3],[2,4],[2,4]] - multiple events on same day
+[[1,2],[1,2],[1,2],[1,2],[1,2]] - all events on same day 
+[[1, 10],[1, 10],[1, 10],[1, 10],[1, 10]] - all events can be attended
+[] - no event
+
+6. After considering the 2 candidate approaches, describe your proposed solution in 3 sentences or less. Please make sure your proposed solution passes the 5 tests cases you listed.
+
+start from every event and see how many possible events can be attended
+
+A - B - C
+  - C
+B - C
+C
+
+Once you have visited the path, put it in memory
+
+7. What is the run time of your proposed solution?
+
+O(n)
+
+8. How much space does your solution use?
+
+O(n)
+
+9. Please write pseudocode for this solution. Something that you might share with an interviewer before coding.
+
+for every event:
+    find max event - memo
+    
+    
+find max event (memo, events, i)
+    if i > no of events
+        return 0
+        
+    max_path = 0
+    for event in events i to end
+        if event in momo
+            returen max_path from memo
+        
+        if i+1 event is reachable
+            max_path = max(max_path, max_event(memo, events, i+1))
+            
+    update memo
+    return max_path
+        
+        
+
+10. Run through an example
+
+[[1, 10],[1, 10],[1, 10],[1, 10],[1, 10]] 
+memo 5:0, 4:1 3:2 2:3 1:4
+
+
+1 
+    - 2 
+        - 3 
+            - 4 
+                - 5 
+            - 5
+        - 4
+        - 5
+    - 3
+    - 4
+    - 5
+2
+3
+4
+5
+
+'''
