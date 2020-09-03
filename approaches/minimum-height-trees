@@ -1,0 +1,129 @@
+310. Minimum Height Trees
+https://leetcode.com/problems/minimum-height-trees/
+
+A tree is an undirected graph in which any two vertices are connected by exactly one path. In other words, any connected graph without simple cycles is a tree.
+
+Given a tree of n nodes and n - 1 edges where edges[i] = [ai, bi] indicates that there is an undirected edge between the two nodes ai and bi in the tree, you can choose any node of the tree as the root. When you select a node x as the root, the result tree has height h. Among all possible rooted trees, those with minimum height (i.e. min(h))  are called minimum height trees (MHTs).
+
+Return a list of the root labels of all the MHTs. You can return the answer in any order.
+
+The height of a rooted tree is the number of edges on the longest downward path between the root and a leaf.
+
+ 
+
+Example 1:
+
+
+Input: n = 4, edges = [[1,0],[1,2],[1,3]]
+Output: [1]
+Explanation: As shown, the height of the tree is 1 when the root is one which is the only MHT.
+Example 2:
+
+
+Input: n = 6, edges = [[3,0],[3,1],[3,2],[3,4],[5,4]]
+Output: [3,4]
+
+
+'''
+1. Observations/constraints
+
+Take every node as root and find the height
+min 1 max n
+
+
+2. List one problem you've done before that is similar to this problem
+
+Calculate the height of the tree
+
+3. What are 2 approaches that you think might work? Why did you pick these 2?
+
+DFS - O(n^2)
+BFS - use every node as root and traverse the tree O(nlogn)
+
+1 - 2
+
+1 - 2
+2 - 1
+
+1 - 2 - 3
+
+1 - 1
+2 - 1, 3
+3 - 2
+
+
+
+4. Of the 2 approaches before, which one seems most promising? And why? Trade-offs Analysis
+
+BFS is better with time but will need more space
+DFS is space efficient but will take more time
+
+5. What are 5 tests cases you would use to verify your solution? Why did you pick these ones?
+
+n = 1 [[]]
+n = 2 [[0, 1]]
+n = 3 [[0, 1], [1, 2]]
+n = 6 [[0, 1], [0, 2], [0, 3], [3, 4], [3, 5], [3, 6]]
+
+
+0 - 1
+  - 2
+  - 3 - 4
+      - 5
+      - 6
+    
+
+6. After considering the 2 candidate approaches, describe your proposed solution in 3 sentences or less. Please make sure your proposed solution passes the 5 tests cases you listed.
+
+start traversing from root node using BFS
+The first traversing to cover all nodes is the min height
+Stop traversing beyond min height
+
+7. What is the run time of your proposed solution?
+
+O(n logn)
+
+8. How much space does your solution use?
+
+O(n)
+
+9. Please write pseudocode for this solution. Something that you might share with an interviewer before coding.
+
+output = []
+initialise queue with entry - ([visited nodes], newly added, height) for every node
+min_height = None
+
+while queue:
+    pop element 
+    if min_height and height < min_height - 1
+        add neighbours of all the newly added elements and not in visited
+        height + 1
+        if all nodes are visited -> update min_height = min of min_height or height
+        add new entry to queue
+
+return output 
+
+10. Run through an example
+
+0 - 1 - 2, 3
+1 - 0, 2, 3
+2 - 1 - 0, 3
+3 - 1 - 0, 2
+
+([visited nodes], newly added, height)
+([0], 1, 0)
+([0, 1], 1, 1)
+([0, 1, 2, 3], 2, 2)
+
+([1], 1, 0)
+([1, 0, 2, 3], 3, 1)
+
+([2], 1, 0)
+([2, 1], 1, 1)
+([2, 1, 0, 3], 2, 2)
+
+([3], 1, 0)
+([3, 1], 1, 1)
+([3, 1, 0, 2], 2, 2)
+
+'''
