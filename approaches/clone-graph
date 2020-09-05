@@ -1,0 +1,171 @@
+133. Clone Graph
+https://leetcode.com/problems/clone-graph/
+Given a reference of a node in a connected undirected graph.
+
+Return a deep copy (clone) of the graph.
+
+Each node in the graph contains a val (int) and a list (List[Node]) of its neighbors.
+
+class Node {
+    public int val;
+    public List<Node> neighbors;
+}
+ 
+
+Test case format:
+
+For simplicity sake, each node's value is the same as the node's index (1-indexed). For example, the first node with val = 1, the second node with val = 2, and so on. The graph is represented in the test case using an adjacency list.
+
+Adjacency list is a collection of unordered lists used to represent a finite graph. Each list describes the set of neighbors of a node in the graph.
+
+The given node will always be the first node with val = 1. You must return the copy of the given node as a reference to the cloned graph.
+
+ 
+
+Example 1:
+
+
+Input: adjList = [[2,4],[1,3],[2,4],[1,3]]
+Output: [[2,4],[1,3],[2,4],[1,3]]
+Explanation: There are 4 nodes in the graph.
+1st node (val = 1)'s neighbors are 2nd node (val = 2) and 4th node (val = 4).
+2nd node (val = 2)'s neighbors are 1st node (val = 1) and 3rd node (val = 3).
+3rd node (val = 3)'s neighbors are 2nd node (val = 2) and 4th node (val = 4).
+4th node (val = 4)'s neighbors are 1st node (val = 1) and 3rd node (val = 3).
+Example 2:
+
+
+Input: adjList = [[]]
+Output: [[]]
+Explanation: Note that the input contains one empty list. The graph consists of only one node with val = 1 and it does not have any neighbors.
+Example 3:
+
+Input: adjList = []
+Output: []
+Explanation: This an empty graph, it does not have any nodes.
+Example 4:
+
+
+Input: adjList = [[2],[1]]
+Output: [[2],[1]]
+
+
+
+'''
+1. Observations/constraints
+  
+Deep copy of node
+Keep parent-child relation
+Node value = index + 1
+
+2. List one problem you've done before that is similar to this problem
+
+deep copy linked list
+
+3. What are 2 approaches that you think might work? Why did you pick these 2?
+
+BFS - Traverse graph and get node value and edges. 
+DFS - Traverse graph and get node value and edges
+
+
+4. Of the 2 approaches before, which one seems most promising? And why? Trade-offs Analysis
+
+Both the approaches will take same time and memory.
+
+5. What are 5 tests cases you would use to verify your solution? Why did you pick these ones?
+
+1 
+  - 2 
+      - 4
+      - 5
+  - 3
+      - 6
+      - 7
+      
+1
+
+1 - 2 - 1
+
+
+      
+
+6. After considering the 2 candidate approaches, describe your proposed solution in 3 sentences or less. Please make sure your proposed solution passes the 5 tests cases you listed.
+
+Use BFS to traverse graph and prepare adjacency list and node values.
+Create node objects for all values using node values
+Connect the node object using the relation in adjacency list
+
+7. What is the run time of your proposed solution?
+
+O(E+V)
+
+8. How much space does your solution use?
+
+O(E+V)
+
+9. Please write pseudocode for this solution. Something that you might share with an interviewer before coding.
+
+values = hashmap()
+seen = set()
+
+queue = [root]
+while queue:
+    node = queue.pop()
+    seen.add(node)
+    if node.val not in values:
+        values[node.val] = set()
+        
+    for neighbour in neighbours:
+        if neighbour not in seen:
+            queue.append(neighbour)
+        values[node.val].add(neighbour.val)
+        
+nodes = hashmap()
+new_root = None
+
+for val in values:
+    nodes[val] = Node(val=val, Node=None)
+    
+for val in values:
+    for neighbour in values[val]:
+        node = nodes[val]
+        node.neighbours.add(nodes[neighbour])
+
+return nodes[root.val]
+
+10. Run through an example
+
+using example 1 - 2 - 3 - 4 - 1
+
+queue  1
+values 
+
+queue  2, 4
+values 1: [2, 4]
+
+queue  4, 3 
+values 1: [2, 4], 2: [3, 1]
+
+queue  3
+values 1: [2, 4], 2: [3, 1], 4:[1, 3]
+
+queue  
+values 1: [2, 4], 2: [3, 1], 4:[1, 3], 3:[2, 4]
+
+
+nodes 1:Node(1), 2:Node(2), 3:Node(3), 4:Node(4)
+
+val 1
+    neighbours 2 -> Node(1).neighbour(Node(2))  
+    neighbours 4 -> Node(1).neighbour(Node(4))
+val 2
+    neighbours 3 -> Node(2).neighbour(Node(3))  
+    neighbours 1 -> Node(2).neighbour(Node(1))    
+val 3
+    neighbours 2 -> Node(3).neighbour(Node(2))  
+    neighbours 4 -> Node(3).neighbour(Node(4))  
+val 4
+    neighbours 3 -> Node(4).neighbour(Node(3))  
+    neighbours 1 -> Node(4).neighbour(Node(1)) 
+    
+'''

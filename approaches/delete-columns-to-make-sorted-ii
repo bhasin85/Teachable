@@ -1,0 +1,125 @@
+955. Delete Columns to Make Sorted II
+https://leetcode.com/problems/delete-columns-to-make-sorted-ii/
+We are given an array A of N lowercase letter strings, all of the same length.
+
+Now, we may choose any set of deletion indices, and for each string, we delete all the characters in those indices.
+
+For example, if we have an array A = ["abcdef","uvwxyz"] and deletion indices {0, 2, 3}, then the final array after deletions is ["bef","vyz"].
+
+Suppose we chose a set of deletion indices D such that after deletions, the final array has its elements in lexicographic order (A[0] <= A[1] <= A[2] ... <= A[A.length - 1]).
+
+Return the minimum possible value of D.length.
+
+ 
+
+Example 1:
+
+Input: ["ca","bb","ac"]
+Output: 1
+Explanation: 
+After deleting the first column, A = ["a", "b", "c"].
+Now A is in lexicographic order (ie. A[0] <= A[1] <= A[2]).
+We require at least 1 deletion since initially A was not in lexicographic order, so the answer is 1.
+Example 2:
+
+Input: ["xc","yb","za"]
+Output: 0
+Explanation: 
+A is already in lexicographic order, so we don't need to delete anything.
+Note that the rows of A are not necessarily in lexicographic order:
+ie. it is NOT necessarily true that (A[0][0] <= A[0][1] <= ...)
+Example 3:
+
+Input: ["zyx","wvu","tsr"]
+Output: 3
+Explanation: 
+We have to delete every column.
+
+
+
+'''
+1. Observations/constraints
+
+just match first char
+deletion will range from 0 to len(A[0])
+all elements in a are of same length
+
+
+2. List one problem you've done before that is similar to this problem
+
+suduko
+
+3. What are 2 approaches that you think might work? Why did you pick these 2?
+
+Greedy - Check if first char in order in all strings
+                    True -> return
+                    False -> delete and move to next char
+                    
+Form new list with first char of all elements
+["ca","bb","ac"] -> [[c, b, a], [a, b, c]]
+For every list check if in ascending order
+    
+    
+4. Of the 2 approaches before, which one seems most promising? And why? Trade-offs Analysis
+
+Greedy we will just have to traverse the input one time for the solution - less operations
+Second approach - More space and more operations
+
+5. What are 5 tests cases you would use to verify your solution? Why did you pick these ones?
+
+[a, b, c] - No deletion
+[za, yb, xc] -  one deletion
+[aaaa, aaaa, aaaa, aaaa] - all deletion
+[c, b, a] - not in order
+[a, h, z] - in order
+
+6. After considering the 2 candidate approaches, describe your proposed solution in 3 sentences or less. Please make sure your proposed solution passes the 5 tests cases you listed.
+
+Greedy - Check if first char in order in all strings
+                    True -> return
+                    False -> delete and move to next char
+
+
+7. What is the run time of your proposed solution?
+
+O(N * len(strings))
+
+8. How much space does your solution use?
+
+O(1)
+
+9. Please write pseudocode for this solution. Something that you might share with an interviewer before coding.
+
+delete_counter = 0
+
+for i in 0 to length of string:
+    for all string check if all char at index i are in order:
+        True -> break
+        False -> increase delete_counter by one and continue
+    
+return delete_counter
+
+
+10. Run through an example
+
+[za, yb, xc] delete_counter = 0
+
+[z, y, x] i=0
+delete_counter = 1
+[a, b, c] i=1 -> return delete_counter
+
+
+[aaaa, aaaa, aaaa, aaaa] delete_counter = 0
+
+[a, a, a, a] i=0
+delete_counter = 1
+[a, a, a, a] i=1
+delete_counter = 2
+[a, a, a, a] i=2
+delete_counter = 3
+[a, a, a, a] i=3
+delete_counter = 4
+
+return delete_counter
+
+'''

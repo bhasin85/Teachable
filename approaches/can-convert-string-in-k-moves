@@ -1,0 +1,138 @@
+1540. Can Convert String in K Moves
+https://leetcode.com/problems/can-convert-string-in-k-moves/
+
+Given two strings s and t, your goal is to convert s into t in k moves or less.
+
+During the ith (1 <= i <= k) move you can:
+
+Choose any index j (1-indexed) from s, such that 1 <= j <= s.length and j has not been chosen in any previous move, and shift the character at that index i times.
+Do nothing.
+Shifting a character means replacing it by the next letter in the alphabet (wrapping around so that 'z' becomes 'a'). Shifting a character by i means applying the shift operations i times.
+
+Remember that any index j can be picked at most once.
+
+Return true if it's possible to convert s into t in no more than k moves, otherwise return false.
+
+ 
+
+Example 1:
+
+Input: s = "input", t = "ouput", k = 9
+Output: true
+Explanation: In the 6th move, we shift 'i' 6 times to get 'o'. And in the 7th move we shift 'n' to get 'u'.
+Example 2:
+
+Input: s = "abc", t = "bcd", k = 10
+Output: false
+Explanation: We need to shift each character in s one time to convert it into t. We can shift 'a' to 'b' during the 1st move. However, there is no way to shift the other characters in the remaining moves to obtain t from s.
+Example 3:
+
+Input: s = "aab", t = "bbb", k = 27
+Output: true
+Explanation: In the 1st move, we shift the first 'a' 1 time to get 'b'. In the 27th move, we shift the second 'a' 27 times to get 'b'.
+
+
+
+'''
+1. Observations/constraints
+
+use ascii value to calculate moves needed for shift
+moves depends on k values a -> b using 1 move or 27 move
+moves values 1 to k only be used once
+
+2. List one problem you've done before that is similar to this problem
+
+Starting from start word and get to final word 
+[abc, cbc, cac, cat] get from abc to cat changing once char at a time and only using given words
+
+Suduko solver
+
+3. What are 2 approaches that you think might work? Why did you pick these 2?
+
+Backtracking 
+Recursion
+
+4. Of the 2 approaches before, which one seems most promising? And why? Trade-offs Analysis
+
+Recursion
+Take more memory
+
+BackTracking
+change 1 char out of k//27 choices
+    change 2 char our of k//27 choices
+O(slen * k//27)
+
+5. What are 5 tests cases you would use to verify your solution? Why did you pick these ones?
+
+s = "abc", t = "bcd", k = 10 - common case
+s = "abc", t = "bcd", k = 54 - 1, 27 and 54 shift
+s = "a", t = "z", k = 25 - common case
+s = "z", t = "a", k = 25 - decreasing ascii value
+s = "az", t = "za", k = 27 - 26+ shift
+
+6. After considering the 2 candidate approaches, describe your proposed solution in 3 sentences or less. Please make sure your proposed solution passes the 5 tests cases you listed.
+
+for each available shift
+    remove it from available shift and move to next char
+    if successfull good
+    if not add removed shift to available shifts
+    
+    
+7. What is the run time of your proposed solution?
+
+O(slen * k//27)
+
+8. How much space does your solution use?
+
+O(1)
+
+9. Please write pseudocode for this solution. Something that you might share with an interviewer before coding.
+
+available_shifts = [1, 2, ..... k]
+process(s, t, k, available_shifts, 0)
+
+process(s, t, k, available_shifts, i)
+    traverse achar, tchar from 0 to len(a)
+        shifts_needed = shifts_needed(achar, char, k)
+        for shift in shifts_needed:
+            if shift in available_shifts:
+                available_shifts.pop(shift)
+                if (s, t, k, available_shifts, i+1)
+                    return True
+                else
+                    available_shifts.add(shift)
+        return False
+        
+
+shifts_needed(achar, bchar, k)
+    output = []
+    adiff = ascii bchar - achar
+    
+    while adiff < k
+        output.add(adiff)
+        adiff += 26
+    
+    return output
+
+10. Run through an example
+
+s = "abc", t = "bcd", k = 10
+i 0
+available_shifts = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+shifts_needed = [1] -> return False
+    i 1
+    available_shifts = [2, 3, 4, 5, 6, 7, 8, 9, 10]
+    shifts_needed = [1] -> return False
+
+
+s = "abc", t = "bcd", k = 54
+i 0
+available_shifts = [1, ...27,... 54]
+shifts_needed = [1, 27, 54] -> return True
+    i 1
+    available_shifts = [...27,... 54]
+    shifts_needed = [1, 27, 54] -> return True
+        i 2
+        available_shifts = [...... 54]
+        shifts_needed = [1, 27, 54] -> return True
+'''
